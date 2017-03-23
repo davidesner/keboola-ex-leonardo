@@ -1,1 +1,1 @@
-# keboola-iceportal-ex
+# keboola-leonardo-ex
