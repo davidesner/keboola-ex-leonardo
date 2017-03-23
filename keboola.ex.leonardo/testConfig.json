@@ -1,0 +1,26 @@
+{
+    "storage": {
+       "input": {
+            "tables": [{
+                    "source": "in.c-lonardotest.data",
+                    "destination": "props.csv",
+                    "limit": 50,
+                    "columns": [],
+                    "where_values": [],
+                    "where_operator": "eq"
+                }],
+            "files": []
+        },
+        "output": {
+            "tables": [],
+            "files": []
+        }
+    },
+    "parameters":{
+  "endPointUrl": "https://uat02-api.leonardocloud.com/v1/",
+  "#apiKey": "testKey",
+  "showDuplicates": 0,
+  "incremental": 1
+},
+    "image_parameters": []
+}

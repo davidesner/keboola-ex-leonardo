@@ -1,0 +1,53 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Leonardo extractor config",
+	"type": "object",
+	"properties": {
+		"endpointUrl": {
+			"title": "Endpoint URL",
+			"type": "string",
+			"description": "Leonardo API endpoint URL"
+		},
+		"#apikey": {
+			"title": "API Key",
+			"type": "string",
+			"description": "Leonardo API Key"
+		},
+		"showDuplicates": {
+			"title": "Show duplicates",
+			"type": "boolean",
+			"description": "Show duplicate records",
+			"default": false
+		},
+		"getEntInfo": {
+			"title": "Get property info",
+			"type": "boolean",
+			"description": "Get hotel metadata",
+			"default": false
+		},
+		"incremental": {
+			"propertyOrder": 6000,
+			"title": "Storage upload mode",
+			"description": "Incremental upload will append data to existing tables. Full upload will replace the contents of target table.",
+			"type": "number",
+			"enum": [
+				0,
+				1
+			],
+			"default": 1,
+			"options": {
+				"enum_titles": [
+					"Full",
+					"Incremental"
+				]
+			}
+		}
+	},
+	"required": [
+		"endpointUrl",
+		"#apikey",
+		"showDuplicates",
+		"getEntInfo",
+		"incremental"
+	]
+}
