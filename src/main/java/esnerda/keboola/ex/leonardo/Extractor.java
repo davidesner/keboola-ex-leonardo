@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -54,6 +55,7 @@ public class Extractor {
 		log = new DefaultLogger(Extractor.class);
 
 		File properiesFile = initEnv(args);
+		log.info("Initializing environment...");
 		initWriters();
 		Optional<LeonardoLastState> lastState = null;
 		try {
@@ -63,12 +65,13 @@ public class Extractor {
 		}
 		List<String> propertyIds = parseInputFile(properiesFile);
 		List<String> idsToProcess = removeLastTimeUpdated(propertyIds,
-				lastState.map(LeonardoLastState::getProcessedIds).get());
+				lastState.map(LeonardoLastState::getProcessedIds).orElse(Collections.EMPTY_LIST));
 		if (idsToProcess.isEmpty()) {
 			log.info("All properties from the last run processed. Starting from begining...");
 			idsToProcess = propertyIds;
 		}
 
+		log.info("Setting up the client...");
 		LeonardoWs ws = new LeonardoWs("9Xw3jyNimic%3DNw%3D%3D:GTAtest", "https://uat02-api.leonardocloud.com/v1/");
 		Set<String> processedIds = new HashSet<>();
 		for (String propId : idsToProcess) {

@@ -23,6 +23,7 @@
 					</execution>
 				</executions>
 				<configuration>
+				<includePluginDependencies>true</includePluginDependencies>
 					<mainClass>esnerda.keboola.ex.leonardo.Extractor</mainClass>
 				</configuration>
 			</plugin>
