@@ -51,6 +51,7 @@ public class LeonardoConfigParameters extends IKBCParameters {
 		this.showAllRoomtypes = Optional.ofNullable(showAllRoomtypes).orElse(false);
 		this.endpointUrl = Optional.ofNullable(endpointUrl).orElse(DEFAULT_ENDPOINT);
 		this.incremental = Optional.ofNullable(incremental).orElse(true);
+		this.getEntInfo = Optional.ofNullable(getEntInfo).orElse(false);
 		this.debug = Optional.ofNullable(debug).orElse(false);
 
 		// set param map
