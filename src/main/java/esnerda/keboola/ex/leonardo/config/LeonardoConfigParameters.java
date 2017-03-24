@@ -14,13 +14,13 @@ import esnerda.keboola.components.configuration.ValidationException;
  * @author David Esner
  */
 public class LeonardoConfigParameters extends IKBCParameters {
-	private final static String[] REQUIRED_FIELDS = { "#apikey" };
+	private final static String[] REQUIRED_FIELDS = { "#apiKey" };
 	private final Map<String, Object> parametersMap;
 
 	private final String DEFAULT_ENDPOINT = "";
 
 	/* auth */
-	@JsonProperty("#apikey")
+	@JsonProperty("#apiKey")
 	private String apikey;
 
 	@JsonProperty("endpointUrl")
@@ -55,7 +55,7 @@ public class LeonardoConfigParameters extends IKBCParameters {
 
 		// set param map
 		parametersMap = new HashMap<>();
-		parametersMap.put("#apikey", apikey);
+		parametersMap.put("#apiKey", apikey);
 	}
 
 	@Override

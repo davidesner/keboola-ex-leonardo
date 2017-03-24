@@ -71,7 +71,6 @@ public class Extractor {
 
 		LeonardoWs ws = new LeonardoWs("9Xw3jyNimic%3DNw%3D%3D:GTAtest", "https://uat02-api.leonardocloud.com/v1/");
 		Set<String> processedIds = new HashSet<>();
-
 		for (String propId : idsToProcess) {
 			try {
 				if (config.getGetEntInfo()) {
