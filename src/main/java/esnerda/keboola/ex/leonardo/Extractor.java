@@ -179,7 +179,7 @@ public class Extractor {
 	private static void handleException(KBCException ex) {
 		log.log(ex);
 		if (ex.getSeverity() > 0) {
-			System.exit(ex.getSeverity());
+			System.exit(ex.getSeverity()-1);
 		}
 	}
 
