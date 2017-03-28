@@ -4,6 +4,7 @@ package esnerda.keboola.ex.leonardo.api.entity;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -67,5 +68,12 @@ public class ErrorMessage {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
+
+	@Override
+	public String toString() {
+		return "Error message: " + message + "; Http status " + httpStatusMsg;
+	}
+
+    
 
 }

@@ -35,6 +35,10 @@ public class ErrorResponseFilter implements ClientResponseFilter {
 				// get the "real" error message
 				ErrorMessage error = _MAPPER.readValue(responseContext.getEntityStream(),
 						ErrorMessage.class);
+				if (error.getMessage().equals("Rate limit exceeded")) {
+					throw new RatelimitExceededException("Rate limit exceeded");
+				}
+				
 				Response.Status status = Response.Status.fromStatusCode(responseContext.getStatus());
 				String message =  Optional.ofNullable(error).map(ErrorMessage::toString).orElse("");				
 				message += "HTTP code: " + status.getStatusCode() + " ";
@@ -74,6 +78,12 @@ public class ErrorResponseFilter implements ClientResponseFilter {
 			}
 		}
 
+	}
+	
+	public static class RatelimitExceededException extends RuntimeException {
+		RatelimitExceededException(String message) {
+			super(message);
+		}
 	}
 
 }

@@ -71,15 +71,14 @@ public class Extractor {
 			idsToProcess = propertyIds;
 		}
 
-		log.info("Setting up the client...");
-		LeonardoWs ws = new LeonardoWs("9Xw3jyNimic%3DNw%3D%3D:GTAtest", "https://uat02-api.leonardocloud.com/v1/");
+		log.info("Setting up the client...");		
 		Set<String> processedIds = new HashSet<>();
 		for (String propId : idsToProcess) {
 			try {
 				if (config.getGetEntInfo()) {
-					propResultWriter.writeResult(new PropertyEntityWrapper((ws.getProperty(propId))));
+					propResultWriter.writeResult(new PropertyEntityWrapper((leoWs.getProperty(propId))));
 				}
-				propImagesWriter.writeAllResults(ws.getPropertyImages(propId, null, KEY_ENCODINGS));
+				propImagesWriter.writeAllResults(leoWs.getPropertyImages(propId, null, KEY_ENCODINGS));
 
 				processedIds.add(propId);
 				if (isTimedOut()) {
@@ -144,7 +143,7 @@ public class Extractor {
 		handler = initHandler(args, log);
 		config = (LeonardoConfigParameters) handler.getParameters();
 		try {
-			leoWs = new LeonardoWs(config.getApikey(), config.getEndpointUrl());
+			leoWs = new LeonardoWs(config.getApikey(), config.getEndpointUrl(), log.getLogger());
 			return handler.getInputTables().get(0).getCsvTable();
 		} catch (Exception e) {
 			handleException(new KBCException("Failed to init web service!", e.getMessage(), e, 1));
