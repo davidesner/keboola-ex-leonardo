@@ -24,6 +24,7 @@ import esnerda.keboola.components.result.ResultFileMetadata;
 import esnerda.keboola.components.result.impl.DefaultBeanResultWriter;
 import esnerda.keboola.ex.leonardo.api.LeonardoWs;
 import esnerda.keboola.ex.leonardo.api.entity.ImageItem;
+import esnerda.keboola.ex.leonardo.api.filters.ErrorResponseFilter.RatelimitExceededException;
 import esnerda.keboola.ex.leonardo.config.LeonardoConfigParameters;
 import esnerda.keboola.ex.leonardo.config.LeonardoLastState;
 import esnerda.keboola.ex.leonardo.result.impl.ImageItemWriter;
@@ -86,9 +87,12 @@ public class Extractor {
 				propImagesWriter.writeAllResults(leoWs.getPropertyImages(propId, null, KEY_ENCODINGS));
 
 				processedIds.add(propId);				
+			} catch (RatelimitExceededException e) {
+				log.warning("Extraction timed out, remaing results will be collected on the next run...", null);
+				break;
 			} catch (Exception e) {
 				log.warning("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), e);
-			}
+			} 
 		}
 
 		// collect results
