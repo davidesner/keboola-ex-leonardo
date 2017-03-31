@@ -36,7 +36,7 @@ public class LeonardoWs {
 	public PropertyEntity getProperty(String propertyId) {
 		startTimer();
 		Response res = null;
-		while (!isTimedOut()) {
+		while (res == null && !isTimedOut()) {
 			try {
 				res = client.sendGetRequest("properties/" + propertyId, null);
 			} catch (RatelimitExceededException ex) {
@@ -60,7 +60,7 @@ public class LeonardoWs {
 			params.put("encodings", expand);
 		}
 		Response res = null;
-		while (!isTimedOut()) {
+		while (res == null && !isTimedOut()) {
 			try {
 				res = client.sendGetRequest("properties/" + propertyId + "/images", params);
 			} catch (RatelimitExceededException ex) {

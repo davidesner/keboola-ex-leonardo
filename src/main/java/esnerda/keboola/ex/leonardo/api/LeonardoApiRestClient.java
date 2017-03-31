@@ -86,7 +86,7 @@ public class LeonardoApiRestClient{
 		if (reqRemaining == null || currentReqLimit == 0) {
 			return;
 		}
-		waitNmilis((RATE_LIMIT_TIME_WINDOW_LENGTH/currentReqLimit) + 10);		
+		waitNmilis((RATE_LIMIT_TIME_WINDOW_LENGTH/currentReqLimit));		
 	}
 
 	private void waitNmilis(long interval) {

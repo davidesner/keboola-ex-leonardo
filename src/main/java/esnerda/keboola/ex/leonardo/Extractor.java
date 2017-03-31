@@ -35,7 +35,7 @@ import esnerda.keboola.ex.leonardo.result.wrapper.PropertyEntityWrapper;
  */
 public class Extractor {
 	private static final String KEY_ENCODINGS = "encodings";
-	private static final long TIMEOUT = 10080000L; //3 hrs
+	private static final long TIMEOUT = 9900000L; //3 hrs
 
 	private static KBCConfigurationEnvHandler handler;
 	private static LeonardoConfigParameters config;
@@ -73,17 +73,19 @@ public class Extractor {
 
 		log.info("Setting up the client...");		
 		Set<String> processedIds = new HashSet<>();
+		log.info("Retrieving data...");	
 		for (String propId : idsToProcess) {
+			if (isTimedOut()) {
+				log.warning("Extraction timed out, remaing results will be collected on the next run...", null);
+				break;
+			}
 			try {
 				if (config.getGetEntInfo()) {
-					propResultWriter.writeResult(new PropertyEntityWrapper((leoWs.getProperty(propId))));
+					propResultWriter.writeResult(new PropertyEntityWrapper((leoWs.getProperty(propId))));					
 				}
 				propImagesWriter.writeAllResults(leoWs.getPropertyImages(propId, null, KEY_ENCODINGS));
 
-				processedIds.add(propId);
-				if (isTimedOut()) {
-					break;
-				}
+				processedIds.add(propId);				
 			} catch (Exception e) {
 				log.warning("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), e);
 			}
