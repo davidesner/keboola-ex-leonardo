@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.ClientErrorException;
+
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import esnerda.keboola.components.KBCException;
@@ -28,6 +30,7 @@ import esnerda.keboola.ex.leonardo.api.filters.ErrorResponseFilter.RatelimitExce
 import esnerda.keboola.ex.leonardo.config.LeonardoConfigParameters;
 import esnerda.keboola.ex.leonardo.config.LeonardoLastState;
 import esnerda.keboola.ex.leonardo.result.impl.ImageItemWriter;
+import esnerda.keboola.ex.leonardo.result.wrapper.FailedProperty;
 import esnerda.keboola.ex.leonardo.result.wrapper.PropertyEntityWrapper;
 
 /**
@@ -49,6 +52,7 @@ public class Extractor {
 	/* writers */
 	private static IResultWriter<PropertyEntityWrapper> propResultWriter;
 	private static IResultWriter<ImageItem> propImagesWriter;
+	private static IResultWriter<FailedProperty> failedPropertyWriter;
 
 	public static void main(String[] args) {
 		startTimer();
@@ -71,7 +75,7 @@ public class Extractor {
 			log.info("All properties from the last run processed. Starting from begining...");
 			idsToProcess = propertyIds;
 		}
-
+		List<FailedProperty> failedProperties = new ArrayList<>();
 		log.info("Setting up the client...");		
 		Set<String> processedIds = new HashSet<>();
 		log.info("Retrieving data...");	
@@ -90,12 +94,21 @@ public class Extractor {
 			} catch (RatelimitExceededException e) {
 				log.warning("Extraction timed out, remaing results will be collected on the next run...", null);
 				break;
+			} catch (ClientErrorException e) {
+				log.warning("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), null);
+				failedProperties.add(new FailedProperty(propId, e.getMessage()));	
 			} catch (Exception e) {
 				log.warning("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), e);
+				failedProperties.add(new FailedProperty(propId, e.getMessage()));
 			} 
 		}
 
 		// collect results
+		try {
+			failedPropertyWriter.writeAllResults(failedProperties);
+		} catch (Exception e) {
+			log.warning("Failed to save failed properties.", e);
+		}
 		List<ResultFileMetadata> results = collectResults();
 
 		// remove proccesed ids
@@ -178,9 +191,12 @@ public class Extractor {
 
 			propImagesWriter = new ImageItemWriter();
 			propImagesWriter.initWriter(handler.getOutputTablesPath(), null);
+			
+			failedPropertyWriter = new DefaultBeanResultWriter<>("failedProperties.csv", new String[] { "propertyId" });
+			failedPropertyWriter.initWriter(handler.getOutputTablesPath(), FailedProperty.class);
 
 		} catch (Exception e) {
-			handleException(new KBCException("Failed to init writer!", e.getMessage(), e, 1));
+			handleException(new KBCException("Failed to init writer!", e.getMessage(), e, 2));
 		}
 	}
 
