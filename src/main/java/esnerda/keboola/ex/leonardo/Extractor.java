@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.ProcessingException;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -94,11 +94,11 @@ public class Extractor {
 			} catch (RatelimitExceededException e) {
 				log.warning("Extraction timed out, remaing results will be collected on the next run...", null);
 				break;
-			} catch (ClientErrorException e) {
+			} catch (ProcessingException e) {
 				log.warning("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), null);
 				failedProperties.add(new FailedProperty(propId, e.getMessage()));	
 			} catch (Exception e) {
-				log.warning("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), e);
+				log.error("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), e);
 				failedProperties.add(new FailedProperty(propId, e.getMessage()));
 			} 
 		}
@@ -126,6 +126,7 @@ public class Extractor {
 		try {
 			results.addAll(propResultWriter.closeAndRetrieveMetadata());
 			results.addAll(propImagesWriter.closeAndRetrieveMetadata());
+			results.addAll(failedPropertyWriter.closeAndRetrieveMetadata());
 		} catch (Exception e) {
 			handleException(new KBCException("Failed to write results.", 2, e));
 		}
