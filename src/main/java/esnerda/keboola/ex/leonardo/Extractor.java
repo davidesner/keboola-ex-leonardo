@@ -39,7 +39,7 @@ import esnerda.keboola.ex.leonardo.result.wrapper.PropertyEntityWrapper;
  */
 public class Extractor {
 	private static final String KEY_ENCODINGS = "encodings";
-	private static final long TIMEOUT = 9900000L; //3 hrs
+	private static final long TIMEOUT = 120000L; //3 hrs
 
 	private static KBCConfigurationEnvHandler handler;
 	private static LeonardoConfigParameters config;
@@ -77,15 +77,19 @@ public class Extractor {
 			newRound = true;
 			idsToProcess = propertyIds;
 		} else {
-			log.warning("Retrieving remaining " + idsToProcess.size() + " from the last run...", null);
+			if (!lastState.isPresent()) {
+				log.info("Retrieving " + idsToProcess.size() + " properties.");
+			} else {
+				log.warning("Retrieving remaining " + idsToProcess.size() + " from the last run...", null);
+			}
 		}
-		List<FailedProperty> failedProperties = new ArrayList<>();
-		log.info("Setting up the client...");		
+		List<FailedProperty> failedProperties = new ArrayList<>();			
 		Set<String> processedIds = new HashSet<>();
 		log.info("Retrieving data...");	
 		for (String propId : idsToProcess) {
 			if (isTimedOut()) {
-				log.warning("Extraction timed out, remaing results will be collected on the next run...", null);
+				idsToProcess.removeAll(processedIds);
+				log.error("Extraction timed out, remaing " + idsToProcess.size() + " properties will be collected on the next run...", null);
 				break;
 			}
 			try {
@@ -125,7 +129,8 @@ public class Extractor {
 			}
 			currState.setProcessedIds(new ArrayList<>(processedIds));
 		}
-		finalize(results, currState);		
+		finalize(results, currState);
+		log.info("Extraction finished...");
 	}
 
 	private static final List<ResultFileMetadata> collectResults() {
