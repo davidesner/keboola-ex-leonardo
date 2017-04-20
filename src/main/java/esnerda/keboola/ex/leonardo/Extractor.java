@@ -39,7 +39,7 @@ import esnerda.keboola.ex.leonardo.result.wrapper.PropertyEntityWrapper;
  */
 public class Extractor {
 	private static final String KEY_ENCODINGS = "encodings";
-	private static final long TIMEOUT = 120000L; //3 hrs
+	private static final long TIMEOUT = 9900000L; //3 hrs
 
 	private static KBCConfigurationEnvHandler handler;
 	private static LeonardoConfigParameters config;
