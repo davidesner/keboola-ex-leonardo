@@ -74,6 +74,8 @@ public class Extractor {
 		if (idsToProcess.isEmpty()) {
 			log.info("All properties from the last run processed. Starting from begining...");
 			idsToProcess = propertyIds;
+		} else {
+			log.warning("Retrieving remaining " + idsToProcess.size() + " from the last run...", null);
 		}
 		List<FailedProperty> failedProperties = new ArrayList<>();
 		log.info("Setting up the client...");		
@@ -92,7 +94,9 @@ public class Extractor {
 
 				processedIds.add(propId);				
 			} catch (RatelimitExceededException e) {
-				log.warning("Extraction timed out, remaing results will be collected on the next run...", null);
+				// remove proccesed ids
+				idsToProcess.removeAll(processedIds);
+				log.error("Extraction timed out, remaing " + idsToProcess.size() + " properties will be collected on the next run...", null);
 				break;
 			} catch (ProcessingException e) {
 				log.warning("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), null);
@@ -111,8 +115,7 @@ public class Extractor {
 		}
 		List<ResultFileMetadata> results = collectResults();
 
-		// remove proccesed ids
-		idsToProcess.removeAll(processedIds);
+		
 		LeonardoLastState currState = new LeonardoLastState();
 		if (!processedIds.isEmpty()) {
 			currState.setProcessedIds(new ArrayList<>(processedIds));
