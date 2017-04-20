@@ -71,8 +71,10 @@ public class Extractor {
 		List<String> propertyIds = parseInputFile(properiesFile);
 		List<String> idsToProcess = removeLastTimeUpdated(propertyIds,
 				lastState.map(LeonardoLastState::getProcessedIds).orElse(Collections.EMPTY_LIST));
+		boolean newRound = false;
 		if (idsToProcess.isEmpty()) {
 			log.info("All properties from the last run processed. Starting from begining...");
+			newRound = true;
 			idsToProcess = propertyIds;
 		} else {
 			log.warning("Retrieving remaining " + idsToProcess.size() + " from the last run...", null);
@@ -118,10 +120,12 @@ public class Extractor {
 		
 		LeonardoLastState currState = new LeonardoLastState();
 		if (!processedIds.isEmpty()) {
+			if(lastState.isPresent() && !newRound){
+			processedIds.addAll(lastState.get().getProcessedIds());
+			}
 			currState.setProcessedIds(new ArrayList<>(processedIds));
 		}
-		finalize(results, currState);
-
+		finalize(results, currState);		
 	}
 
 	private static final List<ResultFileMetadata> collectResults() {
