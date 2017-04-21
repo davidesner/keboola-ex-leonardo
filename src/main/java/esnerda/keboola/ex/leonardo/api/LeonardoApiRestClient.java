@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -18,6 +19,8 @@ import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.logging.LoggingFeature.Verbosity;
 
 import esnerda.keboola.ex.leonardo.api.filters.ErrorResponseFilter;
+import esnerda.keboola.ex.leonardo.api.filters.ErrorResponseFilter.RatelimitExceededException;
+import esnerda.keboola.ex.leonardo.util.SimpleTimer;
 
 /**
  * @author David Esner
@@ -42,17 +45,34 @@ public class LeonardoApiRestClient{
 	public Response sendGetRequest(String path, Map<String, String> params) {
 		waitBeforeNext();
 		WebTarget paramTarget = setParams(buildWebTarget(path), params);
-		
-		Response resp =  prepareTargetBuilder(paramTarget).get();	
+		Response resp = null;
+		try {
+			resp = prepareTargetBuilder(paramTarget).get();
+		} catch (ProcessingException e) {
+			if (e.getCause() instanceof RatelimitExceededException) {
+				throw (RatelimitExceededException) e.getCause();
+			} else {
+				throw e;
+			}
+		}
 		setRateLimitValues(resp);
 		return resp;
 	}
 
-	public Response sendPostRequest(String path, Object entity) throws Exception {		
+	public Response sendPostRequest(String path, Object entity) throws Exception {
 		waitBeforeNext();
-		Response response = prepareTargetBuilder(buildWebTarget(path))
-				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-				.post(Entity.entity(entity, MediaType.APPLICATION_JSON));
+		Response response = null;
+		try {
+			response = prepareTargetBuilder(buildWebTarget(path))
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+					.post(Entity.entity(entity, MediaType.APPLICATION_JSON));
+		} catch (ProcessingException e) {
+			if (e.getCause() instanceof RatelimitExceededException) {
+				throw (RatelimitExceededException) e.getCause();
+			} else {
+				throw e;
+			}
+		}
 		setRateLimitValues(response);
 		return response;
 	}
@@ -91,9 +111,8 @@ public class LeonardoApiRestClient{
 
 	private void waitNmilis(long interval) {
 		try {
-
-			Thread.sleep(interval);
-		} catch (InterruptedException | RuntimeException ex) {
+			SimpleTimer.reallySleep(interval);
+		} catch (RuntimeException ex) {
 			Logger.getLogger(getClass().getName()).warning("Thread sleep failed " + ex.getMessage());
 
 		}

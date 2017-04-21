@@ -15,6 +15,7 @@ import esnerda.keboola.ex.leonardo.api.entity.ImageItem;
 import esnerda.keboola.ex.leonardo.api.entity.ImageItemsEntity;
 import esnerda.keboola.ex.leonardo.api.entity.PropertyEntity;
 import esnerda.keboola.ex.leonardo.api.filters.ErrorResponseFilter.RatelimitExceededException;
+import esnerda.keboola.ex.leonardo.util.SimpleTimer;
 
 /**
  * @author David Esner
@@ -91,8 +92,8 @@ public class LeonardoWs {
 
 	private void waitNmilis(long interval) {
 		try {
-			Thread.sleep(interval);
-		} catch (InterruptedException | RuntimeException ex) {
+			SimpleTimer.reallySleep(interval);
+		} catch (RuntimeException ex) {
 			log.warn("Thread sleep failed " + ex.getMessage());
 
 		}

@@ -30,6 +30,7 @@ public class ErrorResponseFilter implements ClientResponseFilter {
 
 	public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException {
 		// for non-200 response, deal with the custom error messages
+		
 		if (responseContext.getStatus() != Response.Status.OK.getStatusCode()) {
 			if (responseContext.hasEntity()) {
 				// get the "real" error message
@@ -77,7 +78,6 @@ public class ErrorResponseFilter implements ClientResponseFilter {
 				throw webAppException;
 			}
 		}
-
 	}
 	
 	public static class RatelimitExceededException extends RuntimeException {
