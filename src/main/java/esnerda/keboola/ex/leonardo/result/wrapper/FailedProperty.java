@@ -5,6 +5,7 @@ package esnerda.keboola.ex.leonardo.result.wrapper;
  */
 public class FailedProperty {
 
+	private String timeStamp;
 	private String propertyId;
 	private String cause;
 
@@ -12,10 +13,11 @@ public class FailedProperty {
 		// TODO Auto-generated constructor stub
 	}
 
-	public FailedProperty(String propertyId, String cause) {
+	public FailedProperty(String propertyId, String cause, String timeStamp) {
 		super();
 		this.propertyId = propertyId;
 		this.cause = cause;
+		this.timeStamp = timeStamp;
 	}
 
 	public String getPropertyId() {
@@ -24,6 +26,10 @@ public class FailedProperty {
 
 	public String getCause() {
 		return cause;
+	}
+
+	public String getTimeStamp() {
+		return timeStamp;
 	}
 
 }

@@ -3,6 +3,7 @@ package esnerda.keboola.ex.leonardo;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -106,10 +107,10 @@ public class Extractor {
 				break;
 			} catch (ProcessingException e) {
 				log.warning("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), null);
-				failedProperties.add(new FailedProperty(propId, e.getMessage()));	
+				failedProperties.add(new FailedProperty(propId, e.getMessage(), Instant.now().toString()));	
 			} catch (Exception e) {
 				log.error("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), e);
-				failedProperties.add(new FailedProperty(propId, e.getMessage()));
+				failedProperties.add(new FailedProperty(propId, e.getMessage(), Instant.now().toString()));
 			} 
 		}
 
@@ -120,8 +121,8 @@ public class Extractor {
 			log.warning("Failed to save failed properties.", e);
 		}
 		List<ResultFileMetadata> results = collectResults();
-
-		
+		//do not try to proccess failed properties again
+		processedIds.removeAll(failedProperties.stream().map(p -> p.getPropertyId()).collect(Collectors.toList()));
 		LeonardoLastState currState = new LeonardoLastState();
 		if (!processedIds.isEmpty()) {
 			if(lastState.isPresent() && !newRound){
