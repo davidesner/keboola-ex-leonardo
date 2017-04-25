@@ -73,6 +73,7 @@ public class Extractor {
 		List<String> idsToProcess = removeLastTimeUpdated(propertyIds,
 				lastState.map(LeonardoLastState::getProcessedIds).orElse(Collections.EMPTY_LIST));
 		boolean newRound = false;
+		boolean timedOut = false;
 		if (idsToProcess.isEmpty()) {
 			log.info("All properties from the last run processed. Starting from begining...");
 			newRound = true;
@@ -89,8 +90,7 @@ public class Extractor {
 		log.info("Retrieving data...");	
 		for (String propId : idsToProcess) {
 			if (isTimedOut()) {
-				idsToProcess.removeAll(processedIds);
-				log.error("Extraction timed out, remaing " + idsToProcess.size() + " properties will be collected on the next run...", null);
+				timedOut = true;
 				break;
 			}
 			try {
@@ -101,9 +101,7 @@ public class Extractor {
 
 				processedIds.add(propId);				
 			} catch (RatelimitExceededException e) {
-				// remove proccesed ids
-				idsToProcess.removeAll(processedIds);
-				log.error("Extraction timed out, remaing " + idsToProcess.size() + " properties will be collected on the next run...", null);
+				timedOut = true;
 				break;
 			} catch (ProcessingException e) {
 				log.warning("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), null);
@@ -118,11 +116,11 @@ public class Extractor {
 		try {
 			failedPropertyWriter.writeAllResults(failedProperties);
 		} catch (Exception e) {
-			log.warning("Failed to save failed properties.", e);
+			log.error("Failed to save failed properties.", e);
 		}
 		List<ResultFileMetadata> results = collectResults();
 		//do not try to proccess failed properties again
-		processedIds.addAll(failedProperties.stream().map(p -> p.getPropertyId()).collect(Collectors.toList()));
+		processedIds.addAll(failedProperties.stream().map(p -> p.getPropertyId()).collect(Collectors.toList()));		
 		LeonardoLastState currState = new LeonardoLastState();
 		if (!processedIds.isEmpty()) {
 			if(lastState.isPresent() && !newRound){
@@ -131,6 +129,10 @@ public class Extractor {
 			currState.setProcessedIds(new ArrayList<>(processedIds));
 		}
 		finalize(results, currState);
+		if (timedOut) {
+			idsToProcess.removeAll(processedIds);
+			log.error("Extraction timed out, remaing " + idsToProcess.size() + " properties will be collected on the next run...", null);
+		}
 		log.info("Extraction finished...");
 	}
 
