@@ -122,7 +122,7 @@ public class Extractor {
 		}
 		List<ResultFileMetadata> results = collectResults();
 		//do not try to proccess failed properties again
-		processedIds.removeAll(failedProperties.stream().map(p -> p.getPropertyId()).collect(Collectors.toList()));
+		processedIds.addAll(failedProperties.stream().map(p -> p.getPropertyId()).collect(Collectors.toList()));
 		LeonardoLastState currState = new LeonardoLastState();
 		if (!processedIds.isEmpty()) {
 			if(lastState.isPresent() && !newRound){
