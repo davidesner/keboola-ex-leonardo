@@ -104,7 +104,7 @@ public class Extractor {
 				timedOut = true;
 				break;
 			} catch (ProcessingException e) {
-				log.warning("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), null);
+				log.warning("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), e);
 				failedProperties.add(new FailedProperty(propId, e.getMessage(), Instant.now().toString()));	
 			} catch (Exception e) {
 				log.error("Failed to retrieve property info. Poperty id: " + propId + " Cause: " + e.getMessage(), e);

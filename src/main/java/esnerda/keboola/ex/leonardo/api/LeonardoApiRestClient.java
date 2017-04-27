@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.logging.LoggingFeature.Verbosity;
 
@@ -39,7 +40,7 @@ public class LeonardoApiRestClient{
 		this.apiKey = apiKey;
 		this.client = ClientBuilder.newClient(
 				new ClientConfig().register(new LoggingFeature(Logger.getAnonymousLogger(), Verbosity.HEADERS_ONLY))
-						.register(ErrorResponseFilter.class));
+						.register(ErrorResponseFilter.class).register(JacksonFeature.class));
 	}
 
 	public Response sendGetRequest(String path, Map<String, String> params) {
