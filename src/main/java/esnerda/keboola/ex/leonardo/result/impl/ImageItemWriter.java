@@ -10,6 +10,7 @@ import esnerda.keboola.ex.leonardo.api.entity.Encodings;
 import esnerda.keboola.ex.leonardo.api.entity.ImageItem;
 import esnerda.keboola.ex.leonardo.result.wrapper.EncodingWrapper;
 import esnerda.keboola.ex.leonardo.result.wrapper.ImageItemWrapper;
+import esnerda.keboola.ex.leonardo.result.wrapper.ImageMetadataWrapper;
 
 /**
  * @author David Esner
@@ -19,6 +20,7 @@ public class ImageItemWriter implements IResultWriter<ImageItem>{
 	
 	private IResultWriter<EncodingWrapper> encodingWriter;
 	private IResultWriter<ImageItemWrapper> imagesgWriter;
+	private IResultWriter<ImageMetadataWrapper> imageMetadataWriter;
 
 	
 	@Override
@@ -27,17 +29,21 @@ public class ImageItemWriter implements IResultWriter<ImageItem>{
 		//collect all results
 		results.addAll(imagesgWriter.closeAndRetrieveMetadata());
 		results.addAll(encodingWriter.closeAndRetrieveMetadata());
+		results.addAll(imageMetadataWriter.closeAndRetrieveMetadata());
 		return results;
 	}
 
 	@Override
 	public void initWriter(String path, Class<ImageItem> clazz) throws Exception {
 		//init encoding writer
-		encodingWriter = new DefaultBeanResultWriter<EncodingWrapper>("imageEncodings.csv", new String[]{});
+		encodingWriter = new DefaultBeanResultWriter<EncodingWrapper>("imageEncodings.csv", new String[]{"imageId", "encoding"});
 		encodingWriter.initWriter(path, EncodingWrapper.class);
 		//init imgs writer
 		imagesgWriter = new DefaultBeanResultWriter<ImageItemWrapper>("images.csv",  new String[]{"id"});
 		imagesgWriter.initWriter(path, ImageItemWrapper.class);				
+		//init imgs writer
+		imageMetadataWriter = new DefaultBeanResultWriter<ImageMetadataWrapper>("imageMetadata.csv",  new String[]{"imageId", "languageCode"});
+		imageMetadataWriter.initWriter(path, ImageMetadataWrapper.class);				
 	}
 
 	@Override
@@ -51,6 +57,7 @@ public class ImageItemWriter implements IResultWriter<ImageItem>{
 		if (encs != null) {
 			encodingWriter.writeAllResults(EncodingWrapper.Builder.build(imgId, encs.getItems()));
 		}
+		imageMetadataWriter.writeAllResults(ImageMetadataWrapper.Builder.build(obj.getId(), obj.getMetadata()));
 
 	}
 

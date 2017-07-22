@@ -1,11 +1,6 @@
 
 package esnerda.keboola.ex.leonardo.api.entity;
 
-import java.util.HashMap;
-import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -22,13 +17,11 @@ public class Metadatum {
     @JsonProperty("languageCode")
     private String languageCode;
     @JsonProperty("shortDescription")
-    private Object shortDescription;
+    private String shortDescription;
     @JsonProperty("longDescription")
     private String longDescription;
     @JsonProperty("caption")
     private String caption;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("languageCode")
     public String getLanguageCode() {
@@ -41,12 +34,12 @@ public class Metadatum {
     }
 
     @JsonProperty("shortDescription")
-    public Object getShortDescription() {
+    public String getShortDescription() {
         return shortDescription;
     }
 
     @JsonProperty("shortDescription")
-    public void setShortDescription(Object shortDescription) {
+    public void setShortDescription(String shortDescription) {
         this.shortDescription = shortDescription;
     }
 
@@ -70,14 +63,5 @@ public class Metadatum {
         this.caption = caption;
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
 
 }

@@ -1,9 +1,6 @@
 package esnerda.keboola.ex.leonardo.result.wrapper;
 
-import java.util.List;
-
 import esnerda.keboola.ex.leonardo.api.entity.ImageItem;
-import esnerda.keboola.ex.leonardo.api.entity.Metadatum;
 
 /**
  * @author David Esner
@@ -16,7 +13,6 @@ public class ImageItemWrapper {
     private String category;
     private Boolean inDistribution;
     private String sourceFilename;
-    private List<Metadatum> metadata = null;
     
     private String status;
     private String provider;
@@ -36,7 +32,6 @@ public class ImageItemWrapper {
 		this.category = img.getCategory();
 		this.inDistribution = img.getInDistribution();
 		this.sourceFilename = img.getSourceFilename();
-		this.metadata = img.getMetadata();
 		this.status = img.getStatus();
 		this.provider = img.getProvider();
 		this.imageGroupId = img.getImageGroupId();
@@ -65,10 +60,6 @@ public class ImageItemWrapper {
 
 	public String getSourceFilename() {
 		return sourceFilename;
-	}
-
-	public List<Metadatum> getMetadata() {
-		return metadata;
 	}
 
 	public String getStatus() {
