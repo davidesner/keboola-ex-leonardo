@@ -33,6 +33,7 @@ import esnerda.keboola.ex.leonardo.config.LeonardoLastState;
 import esnerda.keboola.ex.leonardo.result.impl.ImageItemWriter;
 import esnerda.keboola.ex.leonardo.result.wrapper.FailedProperty;
 import esnerda.keboola.ex.leonardo.result.wrapper.PropertyEntityWrapper;
+import esnerda.keboola.ex.leonardo.util.SimpleTimer;
 
 /**
  * Hello world!
@@ -46,8 +47,6 @@ public class Extractor {
 	private static LeonardoConfigParameters config;
 	private static LeonardoWs leoWs;
 	private static KBCLogger log;
-
-	private static long startTime;
 	
 
 	/* writers */
@@ -56,7 +55,8 @@ public class Extractor {
 	private static IResultWriter<FailedProperty> failedPropertyWriter;
 
 	public static void main(String[] args) {
-		startTimer();
+		SimpleTimer timer = new SimpleTimer(TIMEOUT);
+		timer.startTimer();
 
 		log = new DefaultLogger(Extractor.class);
 
@@ -89,7 +89,7 @@ public class Extractor {
 		Set<String> processedIds = new HashSet<>();
 		log.info("Retrieving data...");	
 		for (String propId : idsToProcess) {
-			if (isTimedOut()) {
+			if (timer.isTimedOut()) {
 				timedOut = true;
 				break;
 			}
@@ -243,13 +243,4 @@ public class Extractor {
 		return ManifestFile.Builder.buildDefaultFromResult(result, null, config.getIncremental()).build();
 	}
 
-	/* -- time counter methods -- */
-	private static void startTimer() {
-		startTime = System.currentTimeMillis();
-	}
-
-	private static boolean isTimedOut() {
-		long elapsed = System.currentTimeMillis() - startTime;
-		return elapsed >= TIMEOUT;
-	}
 }

@@ -22,7 +22,7 @@ import esnerda.keboola.ex.leonardo.util.SimpleTimer;
  */
 public class LeonardoWs {
 	
-	private final static long TIMEOUT = 3600000L;
+	private final static long TIMEOUT = 360000L;
 	private static final long BACK_OFF_INTERVAL = 120000L;
 
 	private LeonardoApiRestClient client;
@@ -35,13 +35,14 @@ public class LeonardoWs {
 	}
 
 	public PropertyEntity getProperty(String propertyId) {
-		startTimer();
+		SimpleTimer timer = new SimpleTimer(TIMEOUT);
+		timer.startTimer();
 		Response res = null;
-		while (res == null && !isTimedOut()) {
+		while (res == null && !timer.isTimedOut()) {
 			try {
 				res = client.sendGetRequest("properties/" + propertyId, null);
 			} catch (RatelimitExceededException ex) {
-				if (isTimedOut()) {
+				if (timer.isTimedOut()) {
 					throw ex;
 				}
 				log.warn("Rate limit exceeded, waiting to restore...");
@@ -52,7 +53,8 @@ public class LeonardoWs {
 	}
 
 	public List<ImageItem> getPropertyImages(String propertyId, List<String> encodings, String expand) {
-		startTimer();
+		SimpleTimer timer = new SimpleTimer(TIMEOUT);
+		timer.startTimer();
 		Map<String, String> params = new HashMap<String, String>();
 		if (StringUtils.isNotBlank(expand)) {
 			params.put("expand", expand);
@@ -61,11 +63,11 @@ public class LeonardoWs {
 			params.put("encodings", expand);
 		}
 		Response res = null;
-		while (res == null && !isTimedOut()) {
+		while (res == null && !timer.isTimedOut()) {
 			try {
 				res = client.sendGetRequest("properties/" + propertyId + "/images", params);
 			} catch (RatelimitExceededException ex) {
-				if (isTimedOut()) {
+				if (timer.isTimedOut()) {
 					throw ex;
 				}
 				log.warn("Rate limit exceeded, waiting to restore...");
@@ -81,14 +83,6 @@ public class LeonardoWs {
 	}
 
 	/* -- time counter methods -- */
-	private void startTimer() {
-		startTime = System.currentTimeMillis();
-	}
-
-	private boolean isTimedOut() {
-		long elapsed = System.currentTimeMillis() - startTime;
-		return elapsed >= TIMEOUT;
-	}
 
 	private void waitNmilis(long interval) {
 		try {
