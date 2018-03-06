@@ -27,7 +27,6 @@ public class LeonardoWs {
 
 	private LeonardoApiRestClient client;
 	private final Logger log;
-	private long startTime;
 	
 	public LeonardoWs(String apiKey, String endpointUrl, Logger log) {
 		this.client  = new LeonardoApiRestClient(apiKey, endpointUrl);
