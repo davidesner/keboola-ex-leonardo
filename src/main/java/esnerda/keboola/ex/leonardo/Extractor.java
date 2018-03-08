@@ -41,7 +41,7 @@ import esnerda.keboola.ex.leonardo.util.SimpleTimer;
  */
 public class Extractor {
 	private static final String KEY_ENCODINGS = "encodings";
-	private static final long TIMEOUT = 370000; //3 hrs
+	private static final long TIMEOUT = 9900000L; //3 hrs
 
 	private static KBCConfigurationEnvHandler handler;
 	private static LeonardoConfigParameters config;
